@@ -1,0 +1,541 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <title>Moon Blaster</title>
+  <link rel="shortcut icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <style>
+    body{
+      background-color:black;
+      padding: 0;
+      margin: 0;
+    }
+    canvas {
+      background: #eee;
+      display: block;
+      margin: 0 auto;
+      position:fixed;
+      z-index:1;
+    }
+    
+    /* fredoka-one-regular - latin */
+    @font-face {
+      font-family: 'Fredoka One';
+      font-style: normal;
+      font-weight: 400;
+      src: url('fredoka-one-v8-latin-regular.eot'); /* IE9 Compat Modes */
+      src: local('Fredoka One'), local('FredokaOne-Regular'),
+           url('fredoka-one-v8-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+           url('fredoka-one-v8-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+           url('fredoka-one-v8-latin-regular.woff') format('woff'), /* Modern Browsers */
+           url('fredoka-one-v8-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+           url('fredoka-one-v8-latin-regular.svg#FredokaOne') format('svg'); /* Legacy iOS */
+    }
+    
+    #play{
+      z-index:3;
+      position:fixed;
+      height:25vh;
+      margin-left:41vw;
+      margin-top:45vh;
+      transition:0.2s;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select:none;
+      user-select:none;
+      -o-user-select:none;
+    }
+    #play:hover{
+      margin-left:39.7vw;
+      margin-top:43vh;
+      height:30vh;
+    }
+    
+    #tutorial{
+      z-index:3;
+      position:fixed;
+      font-family:Fredoka One;
+      color:white;
+      margin-left:10vw;
+      font-size:4vw;
+      margin-top:49vh;
+      padding:1vw 0.5vw 1vw 0.5vw;
+      border: 1vw solid #ffffff;
+      border-radius:2vw;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select:none;
+      user-select:none;
+      -o-user-select:none;
+      transition:0.5s;
+    }
+    #tutorial:hover{
+      color:black !important;
+      background-color:white;
+    }
+    
+    #tutorialModal {
+      height: 30vh;
+      width: 60vw;
+      position: fixed;
+      z-index:5;
+      margin-bottom:-50vh;
+      margin-left:20vw;
+      bottom: 0;
+      left: 0;
+      right:0;
+      background-color: #272727;
+      overflow-x: hidden;
+      transition: 0.2s;
+      border-radius:1.25vw;
+      overflow:hidden !important;
+    }
+    
+    #scoreBoard {
+      height: 30vh;
+      width: 60vw;
+      position: fixed;
+      z-index:5;
+      margin-bottom:-50vh;
+      margin-left:20vw;
+      bottom: 0;
+      left: 0;
+      right:0;
+      background-color: #272727;
+      overflow-x: hidden;
+      transition: 0.2s;
+      border-radius:1.25vw;
+      overflow:hidden !important;
+    }
+          
+  </style>
+</head>
+<body>
+  
+  <div id="homePage" style="display:block;">
+    <div id="body" onclick="closeTutorialModal()">
+      <img src="background.png" style="width:100vw;height:100vh;z-index:2.5;position:fixed;opacity:0.4;-moz-user-select: none; -webkit-user-select: none;-ms-user-select:none;user-select:none;-o-user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false">
+      
+      <h1 style="z-index:3;position:fixed;font-family:Fredoka One;color:white;font-size:10vw;text-align:center;margin-left:16vw;margin-top:3vh; -moz-user-select: none; -webkit-user-select: none;-ms-user-select:none;user-select:none;-o-user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false">Moon Blaster</h1>
+      
+      <img src="play.png" id="play" unselectable="on" onselectstart="return false;" onmousedown="return false" onclick="startGame()">
+      
+      <p style="z-index:3;position:fixed;font-family:Fredoka One;color:white;margin-left:10vw;font-size:4vw;margin-top:49vh;padding:1vw 0.5vw 1vw 0.5vw;border: 1vw solid #ffffff;border-radius:2vw;" id="tutorial" unselectable="on" onselectstart="return false;" onmousedown="return false" onclick="openTutorialModal()">How to Play?</p>
+      
+      <p style="z-index:3;position:fixed;font-family:Fredoka One;color:white;margin-left:58vw;font-size:4vw;margin-top:49vh;padding:1vw 0.5vw 1vw 0.5vw;border: 1vw solid #ffffff;border-radius:2vw;-moz-user-select: none; -webkit-user-select: none;-ms-user-select:none;user-select:none;-o-user-select:none;display:block;" id="normalMode" onclick="normalModeToHardMode()" unselectable="on" onselectstart="return false;" onmousedown="return false">Mode: Normal</p>
+      <p style="z-index:3;position:fixed;font-family:Fredoka One;color:white;margin-left:58vw;font-size:4vw;margin-top:49vh;padding:1vw 0.5vw 1vw 0.5vw;border: 1vw solid #ffffff;border-radius:2vw;-moz-user-select: none; -webkit-user-select: none;-ms-user-select:none;user-select:none;-o-user-select:none;display:none;" id="hardMode" onclick="hardModeToGoldyMode()" unselectable="on" onselectstart="return false;" onmousedown="return false">Mode: Hard</p>
+      <p style="z-index:3;position:fixed;font-family:Fredoka One;color:white;margin-left:58vw;font-size:4vw;margin-top:49vh;padding:1vw 0.5vw 1vw 0.5vw;border: 1vw solid #ffffff;border-radius:2vw;-moz-user-select: none; -webkit-user-select: none;-ms-user-select:none;user-select:none;-o-user-select:none;display:none;" id="godlyMode" onclick="godlyModeToEasyMode()" unselectable="on" onselectstart="return false;" onmousedown="return false">Mode: Godly</p>
+      <p style="z-index:3;position:fixed;font-family:Fredoka One;color:white;margin-left:58vw;font-size:4vw;margin-top:49vh;padding:1vw 0.5vw 1vw 0.5vw;border: 1vw solid #ffffff;border-radius:2vw;-moz-user-select: none; -webkit-user-select: none;-ms-user-select:none;user-select:none;-o-user-select:none;display:none;" id="easyMode" onclick="easyModeToNormalMode()" unselectable="on" onselectstart="return false;" onmousedown="return false">Mode: Easy</p>
+      
+      <script>
+        
+        var easy = false;
+        var normal = true;
+        var hard = false;
+        var godly = false;
+        
+        var gameStart = false;
+        function startGame(){
+          document.getElementById("homePage").style.display = "none";
+          document.getElementById("moonBlaster").style.display = "block";
+          gameStart = true;
+          playGame();
+        }
+        
+        function normalModeToHardMode(){
+          document.getElementById("normalMode").style.display = "none";
+          document.getElementById("hardMode").style.display = "block";
+          
+          easy = false;
+          normal = false;
+          godly  = false;
+          
+          hard = true;
+        }
+        function hardModeToGoldyMode(){
+          document.getElementById("hardMode").style.display = "none";
+          document.getElementById("godlyMode").style.display = "block";
+          
+          easy = false;
+          normal = false;
+          hard  = false;
+          
+          godly = true;
+        }
+        function godlyModeToEasyMode(){
+          document.getElementById("godlyMode").style.display = "none";
+          document.getElementById("easyMode").style.display = "block";
+          mode = 1100;
+          
+          hard = false;
+          normal = false;
+          godly  = false;
+          
+          easy = true;
+        }
+        function easyModeToNormalMode(){
+          document.getElementById("easyMode").style.display = "none";
+          document.getElementById("normalMode").style.display = "block";
+          mode = 900;
+          
+          easy = false;
+          hard = false;
+          godly  = false;
+          
+          normal = true;
+        }
+      </script>
+    </div>
+    
+    <div id="tutorialModal" style="-moz-user-select: none; -webkit-user-select: none;-ms-user-select:none;user-select:none;-o-user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false">
+      <h1 style="font-family:Fredoka One;color:white;font-weight:lighter;margin:1vw;font-size:3vw;">How to play Moon Blaster:</h1>
+      <br>
+      <h1 style="font-family:Fredoka One;color:white;font-weight:lighter;margin:1vw;font-size:1.7vw;">Literally just click the invading planets to shoot their way. You're going to die, but try to stay alive for as long as possible to get the best score for the clout. </h1>
+      <p style="font-family:Fredoka One;color:white;font-weight:lighter;margin:1vw;font-size:2vw;margin-top:-30vh;margin-left:58vw;" onclick="closeTutorialModal()">x</p>
+      
+      <script>
+        function openTutorialModal(){
+          event.stopPropagation();
+          document.getElementById("tutorialModal").style.marginBottom = "35vh";
+          document.getElementById("body").style.opacity = 0.5;
+        }
+        
+        function closeTutorialModal(){
+          document.getElementById("tutorialModal").style.marginBottom = "-50vh";
+          document.getElementById("body").style.opacity = 1;
+        }
+      </script>
+    </div>
+    
+  </div>
+  
+  <div id="moonBlaster" style="display:none;z-index:4;position:fixed;">
+    <div style="color:white;background-color:black;position:fixed;z-index:2;margin:1vw;cursor:default;-moz-user-select: none; -webkit-user-select: none;-ms-user-select:none;user-select:none;-o-user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false"><span style="font-family:Fredoka One;">Score: </span><span id="Score" style="color:white;font-family:Fredoka One;">0</span></div>
+    
+    <canvas id="myCanvas"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js" integrity="sha512-IQLehpLoVS4fNzl7IfH8Iowfm5+RiMGtHykgZJl9AWMgqx0AmJ6cRWcB+GaGVtIsnC4voMfm8f2vwtY+6oPjpQ==" crossorigin="anonymous"></script>
+    
+    <script>
+      var updateScore;
+      var scoreNum = 0;
+      function playGame(){
+        var bro;
+        if(easy == true){
+          bro = 1100;
+        }
+        else if(normal == true){
+          bro = 900;
+        }
+        else if(hard == true){
+          bro = 700;
+        }
+        else if(godly == true){
+          bro = 500;
+        }
+
+      
+        var canvas = document.getElementById("myCanvas");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        var c = canvas.getContext("2d");
+        
+        //Update score
+          updateScore = setInterval(() =>{
+            if((gameStart === true) && document.hasFocus()){
+              scoreNum += 1;
+              document.getElementById("Score").innerHTML = scoreNum;
+            }
+          }, 1000);
+        
+        
+        class Player {
+          constructor(x, y, radius, color){
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.color = color;
+          }
+          
+          draw() {
+            c.beginPath();
+            c.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+            c.fillStyle = this.color;
+            c.fill();
+          }
+        }
+        
+        class Projectile {
+          constructor(x, y, radius, color, velocity){
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.color = color;
+            this.velocity = velocity;
+          }
+          
+          draw() {
+            c.beginPath();
+            c.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+            c.fillStyle = this.color;
+            c.fill();
+          }
+          
+          update(){
+            this.draw();
+            this.x = this.x + this.velocity.x;
+            this.y = this.y + this.velocity.y;
+          }
+        }
+    
+    
+        class Enemy {
+          constructor(x, y, radius, color, velocity){
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.color = color;
+            this.velocity = velocity;
+          }
+          
+          draw() {
+            c.beginPath();
+            c.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+            c.fillStyle = this.color;
+            c.fill();
+          }
+          
+          update(){
+            this.draw();
+            this.x = this.x + this.velocity.x;
+            this.y = this.y + this.velocity.y;
+          }
+        }
+        
+        var friction = 0.985;
+        class Particle {
+          constructor(x, y, radius, color, velocity){
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.color = color;
+            this.velocity = velocity;
+            this.alpha = 1;
+          }
+          
+          draw() {
+            c.save();
+            c.globalAlpha = this.alpha;
+            c.beginPath();
+            c.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+            c.fillStyle = this.color;
+            c.fill();
+            c.restore();
+          }
+          
+          update(){
+            this.draw();
+            this.velocity.x *= friction;
+            this.velocity.y *= friction;
+            this.x = this.x + this.velocity.x;
+            this.y = this.y + this.velocity.y;
+            this.alpha -= 0.01;
+          }
+        }
+        
+    
+        var PlayerX = canvas.width / 2;
+        var PlayerY = canvas.height / 2;
+        
+        var player = new Player(PlayerX, PlayerY, 15, "#ffffff");
+        
+        
+          
+        var projectiles = [];
+        var enemies = [];
+        var particles = [];
+    
+        function spawnEnemies(){
+          setInterval(() => {
+            var radius = (Math.random() * (30)) + 8;
+            var x;
+            var y;
+            
+            if(Math.random() < 0.5){
+              x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius;
+              y = Math.random() * canvas.height;
+            }else {
+              x = Math.random() * canvas.width;
+              y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
+            }
+    
+            var color = `hsl(${Math.random() * 360}, 50%, 50%)`;
+            
+            var angle = Math.atan2(
+              canvas.height / 2 - y,
+              canvas.width / 2 - x
+            );
+          
+            var velocity = {
+              x: Math.cos(angle),
+              y: Math.sin(angle)
+            };
+            
+            if(gameStart == true && document.hasFocus()){
+              enemies.push(new Enemy(x, y, radius, color, velocity));
+            }
+            
+            
+            
+          }, bro);
+          
+        }
+          
+        var animationId;
+        function animate(){
+          animationId = requestAnimationFrame(animate);
+          c.fillStyle = 'rgba(0, 0, 0, 0.06)';
+          c.fillRect(0, 0, canvas.width, canvas.height);
+          player.draw();
+          particles.forEach((particle, index) => {
+            if(particle.alpha <= 0){
+              particles.splice(index, 1);
+            }else {
+              particle.update();
+            }
+          });
+          projectiles.forEach((projectile, index)=> {
+            projectile.update();
+            
+            if(
+              projectile.x + projectile.radius < 0 ||
+              projectile.x - projectile.radius > canvas.width ||
+              projectile.y + projectile.radius < 0 ||
+              projectile.y - projectile.radius > canvas.height
+              )
+              {
+              setTimeout(() => {
+                projectiles.splice(index, 1);
+              }, 0);
+            }
+          
+          });
+          
+          enemies.forEach((enemy, index) => {
+            enemy.update();
+            
+            var playerDistance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+           //end game
+            if(playerDistance - enemy.radius - player.radius < -1){
+              cancelAnimationFrame(animationId);
+              gameStart = false;
+              openScoreBoard();
+            }
+            
+            projectiles.forEach((projectile, projectileIndex) => {
+              var dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
+              
+              // when projectiles touch enemy
+              if(dist - enemy.radius - projectile.radius < -1){
+                
+                for(var i = 0; i < enemy.radius * 2; i++){
+                  particles.push(
+                    new Particle(
+                      projectile.x,
+                      projectile.y,
+                      Math.random() * 2,
+                      enemy.color,
+                      {
+                        x: (Math.random() - 0.5) * (Math.random() * 6),
+                        y: (Math.random() - 0.5) * (Math.random() * 6)
+                      }
+                    )
+                  );
+                } // (Math.random() - 0.5) * (Math.random() * 8)
+                
+                if(enemy.radius - 15 > 15){
+                  gsap.to(enemy, {
+                    radius: enemy.radius - 10
+                  });
+                  setTimeout(() => {
+                    projectiles.splice(projectileIndex, 1);
+                  }, 0);
+                } else {
+                  setTimeout(() => {
+                    enemies.splice(index, 1);
+                    scoreNum += 5;
+                    projectiles.splice(projectileIndex, 1);
+                  }, 0);
+                }
+              }
+            });
+          });
+        }
+        
+        
+        window.addEventListener('click', (event)=>{
+          
+          var angle = Math.atan2(
+            event.clientY - canvas.height / 2,
+            event.clientX - canvas.width / 2
+          );
+          
+          var velocity = {
+            x: Math.cos(angle) * 5,
+            y: Math.sin(angle) * 5
+          };
+          
+          if(gameStart == true){
+            projectiles.push(
+              new Projectile(canvas.width / 2, canvas.height / 2, 5, '#ff8000', velocity)
+            );
+          }
+          
+        });
+        
+        animate();
+        spawnEnemies();
+          
+    }
+  </script>
+  </div>
+  
+  <div id="scoreBoard" style="-moz-user-select: none; -webkit-user-select: none;-ms-user-select:none;user-select:none;-o-user-select:none;" unselectable="on" onselectstart="return false;" onmousedown="return false">
+    <h1 style="font-family:Fredoka One;color:white;font-weight:lighter;margin:1vw;font-size:3vw;text-align:center;" id="scoreMain"></h1>
+    <br>
+    <h1 style="font-family:Fredoka One;color:white;font-weight:lighter;margin:1vw;font-size:1.55vw;text-align:center;">Would you like to try again?</h1>
+    <div style="margin-top:1vh;">
+      <p style="font-family:Fredoka One;color:#272727;font-weight:lighter;margin:1vw;font-size:1.5vw;text-align:center;background-color:white;width:5vw;height:4vh;border-radius:0.25vw;margin-left:24.5vw;margin-bottom:-1.4vh !important;z-index:1;" onclick="restartGame()">Yes</p>
+      <p style="font-family:Fredoka One;color:#272727;font-weight:lighter;margin:1vw;font-size:1.5vw;text-align:center;background-color:white;width:5vw;height:4vh;border-radius:0.25vw;margin-top:-4vh;margin-left:31.5vw;" onclick="goToHomeScreen()">No</p>
+    </div>
+    <script>
+      setInterval(() =>{
+        if((gameStart === false) && document.hasFocus()){
+          document.getElementById("scoreMain").innerHTML = "Your score was " + document.getElementById("Score").innerHTML + "!";
+        }
+      }, 1);
+      
+      function openScoreBoard(){
+        document.getElementById("scoreBoard").style.marginBottom = "35vh";
+        document.getElementById("moonBlaster").style.opacity = 0.5;
+      }
+        
+      function closeScoreBoard(){
+        document.getElementById("scoreBoard").style.marginBottom = "-50vh";
+        document.getElementById("moonBlaster").style.opacity = 1;
+      }
+      
+      function restartGame(){
+        clearInterval(updateScore);
+        scoreNum = 0;
+        startGame();
+        closeScoreBoard();
+      }
+      
+      function goToHomeScreen(){
+        window.location.reload();
+      }
+
+    </script>
+  </div>
+
+</body>
